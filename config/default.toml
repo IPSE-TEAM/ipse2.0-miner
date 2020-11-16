@@ -1,0 +1,18 @@
+[miner]
+nickname = "the_name_of_miner"
+region = "the_regin_of_miner"
+url = "http://localhost:7001"
+capacity = 1024000000
+unit_price = 100
+
+[chain]
+url = "ws://localhost:9944"
+
+[data]
+db = "db"
+keystore = "keystore"
+
+
+[ipfs]
+uri = "http://127.0.0.1:5001"
+local = false
