@@ -19,6 +19,11 @@ pub fn delete_by_hash(settings: &Settings, hash: &[u8]) {
     ()
 }
 
+/// update miner info(capacity)
+// pub fn update_miner_info(settings: &Settings) {
+//
+//     ()
+// }
 
 pub fn rm_expired_data(settings: &Settings) {
     let kv_client = kv_database(settings).unwrap().client().unwrap();

@@ -7,8 +7,7 @@ use crate::utils::create_file;
 use crate::error::MinerError;
 use crate::settings::Settings;
 
-const CONFIG: &str = r#"
-[miner]
+const CONFIG: &str = r#"[miner]
 nickname = "the_name_of_miner"
 region = "the_regin_of_miner"
 url = "http://localhost:7001"
@@ -19,7 +18,8 @@ unit_price = 100
 url = "ws://localhost:9944"
 
 [data]
-path = "data/db"
+db = "db"
+keystore = "keystore"
 
 
 [ipfs]

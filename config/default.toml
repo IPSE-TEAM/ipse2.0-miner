@@ -1,7 +1,7 @@
 [miner]
 nickname = "the_name_of_miner"
 region = "the_regin_of_miner"
-url = "http://localhost:7001"
+url = "http://localhost"
 capacity = 1024000000
 unit_price = 100
 

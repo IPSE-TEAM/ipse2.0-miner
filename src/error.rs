@@ -2,6 +2,7 @@ use std::error::Error as StdError;
 use std::fmt;
 use ipfs_api::response::Error as IpfsError;
 use substrate_subxt::Error as SubXtError;
+use config::ConfigError;
 
 #[derive(Debug)]
 pub enum MinerErrorKind {
@@ -10,6 +11,7 @@ pub enum MinerErrorKind {
     Msg(String),
     Io(::std::io::Error),
     Ipfs(IpfsError),
+    Config(ConfigError),
     SubXt(SubXtError),
 }
 
@@ -39,6 +41,7 @@ impl fmt::Display for MinerError {
             MinerErrorKind::Msg(ref message) => write!(f, "{}", message),
             MinerErrorKind::Io(ref e) => write!(f, "{}", e),
             MinerErrorKind::Ipfs(ref e) => write!(f, "connection error"),
+            MinerErrorKind::Config(ref e) => write!(f, "Config error"),
             MinerErrorKind::SubXt(ref e) => write!(f, "connection error"),
             MinerErrorKind::FileNotFound => write!(f, "The accessed file does not exist"),
             MinerErrorKind::CallError => write!(f, "The requested method does not exist"),
@@ -69,6 +72,12 @@ impl From<String> for MinerError {
 impl From<IpfsError> for MinerError {
     fn from(e: IpfsError) -> Self {
         Self { kind: MinerErrorKind::Ipfs(e), source: None }
+    }
+}
+
+impl From<ConfigError> for MinerError {
+    fn from(e: ConfigError) -> Self {
+        Self { kind: MinerErrorKind::Config(e), source: None }
     }
 }
 

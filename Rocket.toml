@@ -14,7 +14,7 @@ keep_alive = 5
 log = "normal"
 hi = "Hello!" # this is an unused extra; maybe application specific?
 is_extra = true # this is an unused extra; maybe application specific?
-#secret_key = "hPRYyVRiMyxpw5sBB1XeCMN1kFsDCqKvBi2QJx1BVHQk="
+secret_key = "hPRYyVRiMyxpw5sBB123241XeCMN11kFsDCqKvBi2QJx1BVHQk="
 
 [staging]
 address = "0.0.0.0"
@@ -23,7 +23,7 @@ workers = 2
 keep_alive = 5
 log = "normal"
 # don't use this key! generate your own and keep it private!
-#secret_key = "8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVeXJg="
+secret_key = "1hPRYyVRiMyxpw5sBB123241XeCMN11kFsDCqKvBi2QJx1BVHQk1"
 
 [production]
 address = "0.0.0.0"
@@ -32,4 +32,4 @@ workers = 12
 keep_alive = 5
 log = "critical"
 # don't use this key! generate your own and keep it private!
-#secret_key = "hPRYyVRiMyxpw5sBB1XeCMN1kFsDCqKvBi2QJx1BVHQk="
+secret_key = "hPRYyVRiMyxpw5sBB123241XeCMN11kFsDCqKvBi2QJx1BVHQk1="

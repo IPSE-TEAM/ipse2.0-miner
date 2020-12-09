@@ -12,6 +12,9 @@ mod routes {
     use crate::cmd::serve::service::{ipfs_write, ipfs_delete, ipfs_verify, add_order_info};
 
 
+    // TODO: 查询用户对应的order_id 和 url -> 链上
+    //
+
     #[post("/order/<cid>", data = "<data>")]
     pub(crate) fn create_order(client_config: State<'_, ClientConfig>, cid: Option<String>, data: MultipartDatas) -> Result<JsonValue> {
         let res: Result<JsonValue> = executor::block_on(ipfs_write(client_config.inner(), cid.unwrap().as_str(), data));
@@ -198,6 +201,7 @@ use substrate_subxt::{Client, ClientBuilder};
 use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use codec::{Encode, Decode};
+use log::{info};
 
 
 use crate::settings::{Settings, sub_client, kv_database, ipfs_client};
@@ -205,6 +209,8 @@ use crate::storage::kv::rocksdb::KVDatabase;
 use crate::constants::META_COL;
 use crate::chain::IpseRuntime;
 use crate::chain::register_miner;
+use crate::error::Result;
+
 
 
 #[catch(404)]
@@ -259,20 +265,24 @@ fn cors_fairing() -> Cors {
 }
 
 
-pub fn serve(settings: &Settings, address: &str, port: u16) {
+pub fn serve(settings: &Settings, address: &str, port: u16) -> Result<()> {
     let config = Config::build(Environment::Production)
         .address(address)
         .port(port)
+        .secret_key("7Xui7SN4mI+7egV/9dlfYYLGQJeEx3+DwmSQLwDVXJg=")
         .finalize().unwrap();
 
     let client_config = ClientConfig {
-        sub_client: sub_client(settings),
-        kv_database: kv_database(settings).unwrap(),
-        ipfs_client: ipfs_client(settings).unwrap(),
+        sub_client: sub_client(settings)?,
+        kv_database: kv_database(settings)?,
+        ipfs_client: ipfs_client(settings)?,
     };
 
     // register_miner
-    executor::block_on(register_miner(settings, sub_client(settings)));
+    executor::block_on(register_miner(settings, sub_client(settings)?));
+
+    info!("register_miner");
+    println!("register_miner");
 
     rocket::custom(config)
         .mount(
@@ -287,4 +297,5 @@ pub fn serve(settings: &Settings, address: &str, port: u16) {
         .manage(client_config)
         .attach(cors_fairing())
         .register(catchers![not_found]).launch();
+    Ok(())
 }

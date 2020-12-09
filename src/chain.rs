@@ -8,7 +8,7 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentifyAccount, Verify},
     MultiSignature, OpaqueExtrinsic,
 };
-use sub_runtime::ipse::{Order, Miner as SubMiner};
+use sub_runtime::ipse::{Order, Miner};
 use substrate_subxt::{
     balances::{Balances, AccountData, BalancesEventsDecoder},
     module,
@@ -40,7 +40,7 @@ pub trait Ipse: System + Balances {}
 // define Store
 #[derive(Encode, Store)]
 pub struct MinersStore<T: Ipse> {
-    #[store(returns = Option < SubMiner < Balance >>)]
+    #[store(returns = Option < Miner < AccountId, Balance >>)]
     pub key: AccountId,
     pub _runtime: PhantomData<T>,
 }

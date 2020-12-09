@@ -9,9 +9,11 @@ use kvdb_rocksdb::DatabaseConfig;
 use ipfs_api::{IpfsClient, TryFromUri};
 use http::uri::InvalidUri;
 use std::path::PathBuf;
+use std::result;
 use crate::chain::IpseRuntime;
 use crate::storage::kv::rocksdb::KVDatabase;
 use crate::constants::META_COL;
+use crate::error::{Result, MinerError};
 
 
 #[derive(Debug, Deserialize, Clone)]
@@ -51,7 +53,7 @@ pub struct Settings {
 
 
 impl Settings {
-    pub fn new() -> Result<Self, ConfigError> {
+    pub fn new() -> result::Result<Self, ConfigError> {
         let mut s = Config::new();
 
         // Start off by merging in the "default" configuration file
@@ -65,7 +67,7 @@ impl Settings {
 
         s.try_into()
     }
-    pub fn build(file: PathBuf) -> Result<Self, ConfigError> {
+    pub fn build(file: PathBuf) -> result::Result<Self, ConfigError> {
         let mut s = Config::new();
         s.merge(File::with_name(file.into_os_string().into_string().unwrap().as_str()))?;
         s.try_into()
@@ -73,18 +75,17 @@ impl Settings {
 }
 
 
-pub fn sub_client(settings: &Settings) -> Client<IpseRuntime> {
+pub fn sub_client(settings: &Settings) -> Result<Client<IpseRuntime>> {
     let chain_url = settings.chain.url.clone();
 
-    let res = executor::block_on(
+    executor::block_on(
         ClientBuilder::<IpseRuntime>::new()
             .set_url(chain_url)
             .build()
-    );
-    res.unwrap()
+    ).map_err(|_| MinerError::msg("ipse server connect error"))
 }
 
-pub fn kv_database(settings: &Settings) -> io::Result<KVDatabase> {
+pub fn kv_database(settings: &Settings) -> Result<KVDatabase> {
     let config = DatabaseConfig::with_columns(META_COL);
 
     let path = settings.data.db.clone();
@@ -96,6 +97,6 @@ pub fn kv_database(settings: &Settings) -> io::Result<KVDatabase> {
 }
 
 
-pub fn ipfs_client(settings: &Settings) -> Result<IpfsClient, InvalidUri> {
-    IpfsClient::from_str(settings.ipfs.uri.as_str())
+pub fn ipfs_client(settings: &Settings) -> Result<IpfsClient> {
+    IpfsClient::from_str(settings.ipfs.uri.as_str()).map_err(|_| MinerError::msg("ipfs invalid serve url"))
 }
