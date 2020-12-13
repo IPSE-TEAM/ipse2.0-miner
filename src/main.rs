@@ -8,8 +8,8 @@ extern crate rocket_contrib;
 extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
-// #[macro_use]
-// extern crate substrate_subxt;
+#[macro_use]
+extern crate shells;
 
 use std::env;
 use std::path::PathBuf;
@@ -27,7 +27,7 @@ mod error;
 mod settings;
 mod storage;
 mod chain;
-mod utils;
+mod util;
 mod color;
 
 
