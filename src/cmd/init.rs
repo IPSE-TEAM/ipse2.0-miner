@@ -3,7 +3,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use crate::error::Result;
-use crate::utils::create_file;
+use crate::util::file::create_file;
 use crate::error::MinerError;
 use crate::settings::Settings;
 

@@ -14,8 +14,8 @@ pub fn delete_by_hash(settings: &Settings, hash: &[u8]) {
     let kv_client = kv_database(settings).unwrap().client().unwrap();
     let path = kv_client.get(2, hash);
 
-    let ic = ipfs_client(settings).unwrap();
-    executor::block_on(ic.files_rm(str::from_utf8(&path.unwrap().unwrap()).unwrap(), true));
+    // let ic = ipfs_client(settings).unwrap();
+    // executor::block_on(ic.files_rm(str::from_utf8(&path.unwrap().unwrap()).unwrap(), true));
     ()
 }
 

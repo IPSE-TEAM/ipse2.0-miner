@@ -6,7 +6,6 @@ use substrate_subxt::{Client, ClientBuilder};
 use futures::executor;
 use std::io;
 use kvdb_rocksdb::DatabaseConfig;
-use ipfs_api::{IpfsClient, TryFromUri};
 use http::uri::InvalidUri;
 use std::path::PathBuf;
 use std::result;
@@ -14,6 +13,7 @@ use crate::chain::IpseRuntime;
 use crate::storage::kv::rocksdb::KVDatabase;
 use crate::constants::META_COL;
 use crate::error::{Result, MinerError};
+use crate::storage::ipfs::client::IpfsClient;
 
 
 #[derive(Debug, Deserialize, Clone)]
@@ -98,5 +98,5 @@ pub fn kv_database(settings: &Settings) -> Result<KVDatabase> {
 
 
 pub fn ipfs_client(settings: &Settings) -> Result<IpfsClient> {
-    IpfsClient::from_str(settings.ipfs.uri.as_str()).map_err(|_| MinerError::msg("ipfs invalid serve url"))
+    Ok(IpfsClient::new(settings.ipfs.uri.as_str()))
 }
