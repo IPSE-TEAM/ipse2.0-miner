@@ -1,7 +1,6 @@
 use codec::Encode;
 use core::marker::PhantomData;
 use frame_support::Parameter;
-use sp_keyring::AccountKeyring;
 use sp_runtime::{
     traits::{AtLeast32Bit, Scale},
     generic::{Header as SHeader},
@@ -9,22 +8,14 @@ use sp_runtime::{
     MultiSignature, OpaqueExtrinsic,
 };
 use sub_runtime::ipse::{Order, Miner};
-use substrate_subxt::{
-    balances::{Balances, AccountData, BalancesEventsDecoder},
-    module,
-    PairSigner,
-    extrinsic::{DefaultExtra},
-    Runtime,
-    Client,
-    system::{System, SystemEventsDecoder},
-    Call, Store,
-};
+use substrate_subxt::{balances::{Balances, AccountData, BalancesEventsDecoder}, module, PairSigner, extrinsic::{DefaultExtra}, Runtime, Client, system::{System, SystemEventsDecoder}, Call, Store};
+use sp_core::{sr25519::Pair, Pair as PairT};
 
 use frame_support::sp_runtime::SaturatedConversion;
-use std::convert::TryFrom;
 
 use crate::error::MinerError;
 use crate::settings::Settings;
+use sp_core::crypto::Ss58Codec;
 
 pub type AccountId = <IpseRuntime as System>::AccountId;
 pub type Balance = <IpseRuntime as Balances>::Balance;
@@ -58,6 +49,8 @@ pub struct RegisterMinerCall<T: Ipse> {
     pub nickname: Vec<u8>,
     pub region: Vec<u8>,
     pub url: Vec<u8>,
+    pub public_key: Vec<u8>,
+    pub income_address: Vec<u8>,
     pub capacity: u64,
     pub unit_price: Balance,
 }
@@ -117,24 +110,27 @@ impl Timestamp for IpseRuntime {
 }
 
 
-pub async fn register_miner(settings: &Settings, sub_client: Client<IpseRuntime>) -> Result<sp_core::H256, MinerError> {
+pub async fn register_miner(settings: &Settings, pair: Pair, sub_client: Client<IpseRuntime>) -> Result<sp_core::H256, MinerError> {
 
     // https://stackoverflow.com/questions/56081117/how-do-you-convert-between-substrate-specific-types-and-rust-primitive-types
-    let signer = PairSigner::new(AccountKeyring::Alice.pair());
-    // https://github.com/IPSE-TEAM/ipse-core/blob/ipse/bin/node/runtime/src/ipse.rs#L112
+
+    let signer = PairSigner::new(pair);
+
     let res = sub_client.register_miner(
         &signer,
         settings.miner.nickname.as_bytes().to_vec(),
         settings.miner.region.as_bytes().to_vec(),
         settings.miner.url.as_bytes().to_vec(),
+        settings.miner.public_key.as_bytes().to_vec(),
+        settings.miner.income_address.as_bytes().to_vec(),
         settings.miner.capacity as u64,
         settings.miner.unit_price.saturated_into::<Balance>(),
     ).await?;
     Ok(res)
 }
 
-pub async fn confirm_order(sub_client: Client<IpseRuntime>, order_id: u64, url: String) -> Result<sp_core::H256, MinerError> {
-    let signer = PairSigner::new(AccountKeyring::Alice.pair());
+pub async fn confirm_order(pair: Pair, sub_client: Client<IpseRuntime>, order_id: u64, url: String) -> Result<sp_core::H256, MinerError> {
+    let signer = PairSigner::new(pair);
     let res = sub_client.confirm_order(
         &signer,
         order_id,
@@ -143,10 +139,8 @@ pub async fn confirm_order(sub_client: Client<IpseRuntime>, order_id: u64, url: 
     Ok(res)
 }
 
-pub async fn delete_order(sub_client: Client<IpseRuntime>, order_id: u64) -> Result<sp_core::H256, MinerError> {
-    use std::str;
-
-    let signer = PairSigner::new(AccountKeyring::Alice.pair());
+pub async fn delete_order(pair: Pair, sub_client: Client<IpseRuntime>, order_id: u64) -> Result<sp_core::H256, MinerError> {
+    let signer = PairSigner::new(pair);
     let res = sub_client.delete_order(
         &signer,
         order_id,

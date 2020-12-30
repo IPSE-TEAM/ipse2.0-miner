@@ -1,3 +1,4 @@
+#![feature(backtrace)]
 #![feature(proc_macro_hygiene, decl_macro)]
 #![feature(try_trait)]
 #[macro_use]
@@ -7,17 +8,19 @@ extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
-extern crate lazy_static;
-#[macro_use]
 extern crate shells;
 
+use chrono::Local;
 use std::env;
 use std::path::PathBuf;
-use log::{info};
 use std::path::Path;
+use env_logger::Builder;
+use log::{self, LevelFilter};
 
-use crate::cmd::{serve, init, job};
+
+use crate::cmd::{serve, init, job, generate};
 use crate::settings::Settings;
+use crate::error::log_backtrace;
 
 
 mod cli;
@@ -32,6 +35,7 @@ mod color;
 
 
 fn main() {
+    env_logger::init();
     let matches = cli::build_cli().get_matches();
 
     let root_dir = match matches.value_of("root").unwrap() {
@@ -52,7 +56,7 @@ fn main() {
         None => root_dir.join("config.toml"),
     };
 
-    match matches.subcommand() {
+    let res = match matches.subcommand() {
         ("serve", Some(matches)) => {
             let address = matches.value_of("address").unwrap_or_default();
             let port = matches.value_of("port").unwrap_or_default().parse::<u16>().unwrap();
@@ -60,24 +64,25 @@ fn main() {
             // load setting for current fold
             let settings = Settings::build(config_file).unwrap();
 
-            serve(&settings, address, port);
+            serve(&settings, address, port)
         }
         ("init", Some(matches)) => {
             let force = matches.is_present("force");
-            info!("init project");
-            match cmd::init(matches.value_of("name").unwrap(), force) {
-                Ok(()) => (),
-                Err(e) => {
-                    // TODO: give a tip
-                    eprintln!("Error: {}", e);
-                    ::std::process::exit(1);
-                }
-            };
+            cmd::init(matches.value_of("name").unwrap(), force)
+        }
+        ("generate", Some(matches)) => {
+            let words = matches.value_of("words").unwrap_or_default();
+            generate(words)
         }
         ("job", Some(matches)) => {
             let settings = Settings::build(config_file).unwrap();
             job(&settings)
         }
         _ => unreachable!(),
+    };
+    if let Err(e) = res {
+        log::error!("Error: {}", e);
+
+        std::process::exit(101);
     }
 }

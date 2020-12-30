@@ -1,14 +1,6 @@
-use reqwest;
-use failure::Error;
-
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use codec::{Encode, Decode};
-use std::io::Read;
-use reqwest::multipart::Part;
-use serde_json;
-use reqwest::Client;
 
-use std::fs;
 use nix::sys::stat::stat;
 use std::path::Path;
 
@@ -58,7 +50,7 @@ pub struct Stat {
 
 impl Default for IpfsClient {
     fn default() -> Self {
-        Self { uri: "127.0.0.1:5001".parse().unwrap() }
+        Self { uri: "http://127.0.0.1:5001".parse().unwrap() }
     }
 }
 
@@ -126,7 +118,7 @@ mod test {
     fn test_default_client() {
         let client = IpfsClient::default();
         let uri = client.uri();
-        assert_eq!("http://127.0.0.1:5001/", uri);
+        assert_eq!("http://127.0.0.1:5001", uri);
     }
 }
 

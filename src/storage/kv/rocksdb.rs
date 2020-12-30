@@ -1,7 +1,7 @@
 use std::fmt;
 use std::io::{self, Result};
 use kvdb_rocksdb::{DatabaseConfig, Database};
-use kvdb::{IoStatsKind, KeyValueDB};
+use kvdb::KeyValueDB;
 
 
 /// Required length of prefixes.
@@ -51,7 +51,7 @@ impl KVDatabase {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::io::{self, Read};
+    use std::io::{self};
     use tempdir::TempDir;
 
     fn init_db(columns: u32) -> io::Result<Database> {
