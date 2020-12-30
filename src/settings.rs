@@ -1,12 +1,10 @@
 use std::env;
 use config::{ConfigError, Config, File, Environment};
 use std::collections::HashMap;
-use lazy_static::lazy_static;
 use substrate_subxt::{Client, ClientBuilder};
 use futures::executor;
 use std::io;
 use kvdb_rocksdb::DatabaseConfig;
-use http::uri::InvalidUri;
 use std::path::PathBuf;
 use std::result;
 use crate::chain::IpseRuntime;
@@ -21,12 +19,20 @@ pub struct Miner {
     pub nickname: String,
     pub region: String,
     pub url: String,
+    pub public_key: String,
+    pub secret_seed: String,
+    pub income_address: String,
     pub capacity: u64,
     pub unit_price: u64,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Chain {
+    pub url: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Search {
     pub url: String,
 }
 
@@ -49,6 +55,7 @@ pub struct Settings {
     pub chain: Chain,
     pub data: Data,
     pub ipfs: Ipfs,
+    pub search: Search,
 }
 
 

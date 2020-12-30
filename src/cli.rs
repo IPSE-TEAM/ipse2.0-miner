@@ -7,6 +7,7 @@ pub fn build_cli() -> App<'static, 'static> {
         .author(crate_authors!())
         .about(crate_description!())
         .setting(AppSettings::SubcommandRequiredElseHelp)
+        .setting(AppSettings::ColoredHelp)
         .arg(
             Arg::with_name("root")
                 .short("r")
@@ -35,7 +36,7 @@ pub fn build_cli() -> App<'static, 'static> {
                         .help("Force creation of project even if directory is non-empty")
                 ]),
             SubCommand::with_name("serve")
-                .about("Serve the site. Rebuild and reload on change automatically")
+                .about("Serve the miner serve")
                 .args(&[
                     Arg::with_name("address")
                         .short("a")
@@ -47,6 +48,15 @@ pub fn build_cli() -> App<'static, 'static> {
                         .long("port")
                         .default_value("8888")
                         .help("Which port to use"),
+                ]),
+            SubCommand::with_name("generate")
+                .about("Generate a random account")
+                .args(&[
+                    Arg::with_name("words")
+                        .short("w")
+                        .long("words")
+                        .default_value("12")
+                        .help("The number of words in the phrase to generate. One of 12 (default), 15, 18, 21 and 24"),
                 ]),
             SubCommand::with_name("job")
                 .about("Scheduling tasks for miner")

@@ -1,4 +1,4 @@
-### /api/v0/order/`<cid>`
+### /api/v0/order/`<address>`
 
 upload data
 
@@ -8,12 +8,12 @@ Methods
 
 **REQUEST QUERY PARAMETERS**
 
-> cid: user public_key
+> address: user address
 >
 > data: uploading data
 
 
-### /api/v0/order/`<cid>`/`hash`
+### /api/v0/order/`<address>`/`hash`
 
 
 add data info(label,category, describe, days)
@@ -26,7 +26,7 @@ Methods
 
 **REQUEST QUERY PARAMETERS**
 
-> cid: user public_key
+> cid: user address
 >
 > hash: data hash 
 
@@ -42,7 +42,7 @@ Methods
 ```
 
 
-### /api/v0/order/`<cid>`/`<hash>`
+### /api/v0/order/`<address>`/`<hash>`
 
 
 delete data
@@ -54,10 +54,10 @@ Methods
 
 **REQUEST QUERY PARAMETERS**
 
-> cid: user public_key
+> address: user address
 
 
-### /api/v0/order/verify/`<cid>`/`<hash>`
+### /api/v0/order/verify/`<address>`/`<hash>`
 
 verify data 
 
@@ -68,7 +68,7 @@ Methods
 
 **REQUEST QUERY PARAMETERS**
 
-> cid: user public_key
+> address: user address
 >
 > hash:data hash 
 
@@ -76,7 +76,7 @@ Methods
 
 ```
 {
-    cid: String,
+    address: String,
     name: String,
     hash: String,
     size: String,
