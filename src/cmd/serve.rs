@@ -107,8 +107,6 @@ mod routes {
             .json(&search_info)
             .send()?;
 
-        println!("请求的json: {:?}", &search_info);
-
         let expire_date = Local::now() + Duration::days(data.days as i64);
 
         // delete data hash pay flag
@@ -120,8 +118,6 @@ mod routes {
 
         kv_client.write(batch)?;
 
-        // todo: put search_info into search engine
-
         Ok(json!(search_info))
     }
 
@@ -129,7 +125,6 @@ mod routes {
     #[delete("/order/<address>/<hash>")]
     pub(crate) fn delete_order(client_config: State<'_, ClientConfig>, address: String, hash: String) -> Result<JsonValue> {
         let client = &client_config.ipfs_client;
-        // TODO: select filename from db
         let res = client.delete(hash.to_owned().as_str());
 
 
