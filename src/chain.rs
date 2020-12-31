@@ -123,7 +123,7 @@ pub async fn register_miner(settings: &Settings, pair: Pair, sub_client: Client<
         settings.miner.url.as_bytes().to_vec(),
         settings.miner.public_key.as_bytes().to_vec(),
         settings.miner.income_address.as_bytes().to_vec(),
-        settings.miner.capacity as u64,
+        (settings.miner.capacity * (10 as u64).pow(14)) as u64,
         settings.miner.unit_price.saturated_into::<Balance>(),
     ).await?;
     Ok(res)
