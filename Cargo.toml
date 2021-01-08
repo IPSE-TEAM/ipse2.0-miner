@@ -22,9 +22,11 @@ schnorrkel = { version = "0.9.1", features = ["preaudit_deprecated", "u64_backen
 # log
 log = "0.4.11"
 env_logger = "0.8.2"
+yansi = "0.5"
 # error
 #anyhow = "1.0.36"
 #thiserror = "1.0.23"
+
 
 # rand
 rand = "0.7.3"

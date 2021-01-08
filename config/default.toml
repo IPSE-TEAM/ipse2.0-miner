@@ -22,3 +22,6 @@ url = "https://www.ipse.io/v3/machine/ipse/"
 [ipfs]
 uri = "http://127.0.0.1:5001"
 local = false
+
+[serve]
+secret_key = "%SECRET_KEY%"

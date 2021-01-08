@@ -6,6 +6,8 @@ use crate::error::Result;
 use crate::util::file::create_file;
 use crate::error::MinerError;
 use crate::settings::Settings;
+use crate::util::id::PasteID;
+
 
 const CONFIG: &str = r#"[miner]
 nickname = "the_name_of_miner"
@@ -29,7 +31,10 @@ url = "https://www.ipse.io/v3/machine/ipse/"
 
 [ipfs]
 uri = "http://127.0.0.1:5001"
-local = false
+local = true
+
+[serve]
+secret_key = "%SECRET_KEY%"
 "#;
 
 
@@ -59,8 +64,14 @@ pub fn init(name: &str, force: bool) -> Result<()> {
         };
     }
 
+    let secret_key =  PasteID::new(44);
+
+    let config = CONFIG
+        .trim_start()
+        .replace("%SECRET_KEY%", &secret_key.to_string());
+
     // generate project data catalog
-    create_file(&path.join("config.toml"), &CONFIG)?;
+    create_file(&path.join("config.toml"), &config)?;
     create_dir_all(path.join("db"))?;
     create_dir_all(path.join("keystore"))?;
 
