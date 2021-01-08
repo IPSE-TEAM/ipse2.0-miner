@@ -7,6 +7,8 @@ use sp_runtime::{
     traits::{BlakeTwo256, IdentifyAccount, Verify},
     MultiSignature, OpaqueExtrinsic,
 };
+
+
 use sub_runtime::ipse::{Order, Miner};
 use substrate_subxt::{balances::{Balances, AccountData, BalancesEventsDecoder}, module, PairSigner, extrinsic::{DefaultExtra}, Runtime, Client, system::{System, SystemEventsDecoder}, Call, Store};
 use sp_core::{sr25519::Pair, Pair as PairT};
@@ -15,7 +17,7 @@ use frame_support::sp_runtime::SaturatedConversion;
 
 use crate::error::MinerError;
 use crate::settings::Settings;
-use sp_core::crypto::Ss58Codec;
+use sp_core::crypto::{Ss58Codec, AccountId32};
 
 pub type AccountId = <IpseRuntime as System>::AccountId;
 pub type Balance = <IpseRuntime as Balances>::Balance;
@@ -50,7 +52,7 @@ pub struct RegisterMinerCall<T: Ipse> {
     pub region: Vec<u8>,
     pub url: Vec<u8>,
     pub public_key: Vec<u8>,
-    pub income_address: Vec<u8>,
+    pub income_address: AccountId,
     pub capacity: u64,
     pub unit_price: Balance,
 }
@@ -122,10 +124,12 @@ pub async fn register_miner(settings: &Settings, pair: Pair, sub_client: Client<
         settings.miner.region.as_bytes().to_vec(),
         settings.miner.url.as_bytes().to_vec(),
         settings.miner.public_key.as_bytes().to_vec(),
-        settings.miner.income_address.as_bytes().to_vec(),
-        (settings.miner.capacity * (10 as u64).pow(14)) as u64,
-        settings.miner.unit_price.saturated_into::<Balance>(),
+        AccountId32::from_string(settings.miner.income_address.as_str())?,
+        settings.miner.capacity as u64,
+        // (settings.miner.unit_price * (10 as u64).pow(14)).saturated_into::<Balance>(),
+        settings.miner.unit_price .saturated_into::<Balance>(),
     ).await?;
+
     Ok(res)
 }
 

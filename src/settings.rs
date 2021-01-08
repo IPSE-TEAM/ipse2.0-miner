@@ -36,6 +36,11 @@ pub struct Search {
     pub url: String,
 }
 
+#[derive(Debug, Deserialize, Clone)]
+pub struct Serve {
+    pub secret_key: String,
+}
+
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Data {
@@ -56,6 +61,7 @@ pub struct Settings {
     pub data: Data,
     pub ipfs: Ipfs,
     pub search: Search,
+    pub serve: Serve,
 }
 
 
@@ -89,7 +95,7 @@ pub fn sub_client(settings: &Settings) -> Result<Client<IpseRuntime>> {
         ClientBuilder::<IpseRuntime>::new()
             .set_url(chain_url)
             .build()
-    ).map_err(|_| MinerError::msg("ipse server connect error"))
+    ).map_err(|_| MinerError::msg("ipfs server connect error"))
 }
 
 pub fn kv_database(settings: &Settings) -> Result<KVDatabase> {

@@ -69,7 +69,6 @@ mod routes {
         let pair = &client_config.pair;
 
 
-
         let signature = pair.sign(&hash.to_owned().as_bytes());
 
         let search_info = MinerRequest {
@@ -88,7 +87,7 @@ mod routes {
             st_uid: ipfs_write_decode.st_uid,
             st_gid: ipfs_write_decode.st_gid,
             st_rdev: ipfs_write_decode.st_rdev,
-            size: ipfs_write_decode.st_size,
+            size: ipfs_write_decode.st_size / 1024,
             st_blksize: ipfs_write_decode.st_blksize,
             st_blocks: ipfs_write_decode.st_blocks,
             st_atime: ipfs_write_decode.st_atime,
@@ -164,6 +163,7 @@ use substrate_subxt::Client;
 use serde::{Deserialize, Serialize};
 use codec::{Encode, Decode};
 use sp_core::{sr25519::Pair, Pair as PairT};
+use log;
 
 
 use crate::settings::{Settings, sub_client, kv_database, ipfs_client};
@@ -173,6 +173,7 @@ use crate::chain::register_miner;
 use crate::error::Result;
 use crate::storage::ipfs::client::IpfsClient;
 use hex as hhex;
+use rocket::logger::LoggingLevel;
 
 
 #[catch(404)]
@@ -263,11 +264,11 @@ fn cors_fairing() -> Cors {
 }
 
 pub fn serve(settings: &Settings, address: &str, port: u16) -> Result<()> {
-    // let config = Config::build(Environment::Production)
-    let config = Config::build(Environment::Development)
+    let config = Config::build(Environment::Production)
         .address(address)
+        .log_level(LoggingLevel::Critical)
         .port(port)
-        .secret_key("7Xui7SN4mI+7egV/9dlfYYLGQJeEx3+DwmSQLwDVXJg=")
+        .secret_key(&settings.serve.secret_key)
         .finalize()?;
 
 
